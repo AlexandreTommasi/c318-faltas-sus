@@ -131,6 +131,13 @@ jupyter notebook
 
 ---
 
+## Pesquisa da primeira entrega (S1)
+
+A [pesquisa de abordagens e métricas para classificação desbalanceada](docs/pesquisa_classificacao_desbalanceada.md)
+registra a proposta de avaliação, os cuidados contra vazamento e as referências
+localizadas no Kaggle, incluindo os limites da consulta. Corresponde à tarefa
+de pesquisa de Fernando (#4); o baseline será desenvolvido na S2 (#8).
+
 ## Limitações
 
 - Os dados são de **uma única cidade** (Vitória-ES), o que pode limitar a generalização para outros contextos do SUS.

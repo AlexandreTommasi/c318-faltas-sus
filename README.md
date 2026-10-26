@@ -204,4 +204,13 @@ jupyter notebook
 
 9. Dantas, L. F.; Fleck, J. L.; Cyrino Oliveira, F. L.; Hamacher, S. *No-shows in appointment scheduling – a systematic literature review*. Health Policy, 2018, 122(4), 412–421. https://doi.org/10.1016/j.healthpol.2018.02.002
 
+## Pesquisa da primeira entrega (S1)
+
+A [pesquisa de abordagens e métricas para classificação desbalanceada](docs/pesquisa_classificacao_desbalanceada.md)
+registra a proposta de avaliação, os cuidados contra vazamento e as referências
+localizadas no Kaggle, incluindo os limites da consulta. Corresponde à tarefa
+de pesquisa de Fernando (#4); o baseline será desenvolvido na S2 (#8).
+
+## Limitações
+
 10. Santos, J. S. *Absenteísmo dos usuários em consultas e procedimentos especializados agendados no SUS: um estudo em um município baiano*. Dissertação (Mestrado), Universidade Federal da Bahia, 2008.

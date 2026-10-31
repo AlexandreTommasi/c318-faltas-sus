@@ -55,6 +55,20 @@ Cada entrada segue o padrão:
 
 ---
 
+### 2026-10-31 — Limpeza do dataset (src/data.py)
+
+**Decisão:** Remover linhas com `age < 0` (1 linha) e linhas em que `appointment_day < scheduled_day` por data (5 linhas com espera negativa). Remover duplicatas ignorando `appointment_id`, mantendo a primeira ocorrência (618 linhas, incluindo 14 grupos com alvo divergente). Manter idades acima de 100 anos (7 linhas: 2 com 102 e 5 com 115).
+
+**Motivação:**  
+- Idades negativas são erro de registro sem valor de imputação plausível.  
+- Espera negativa (consulta marcada antes do agendamento) é erro de sistema; não representa comportamento real.  
+- Duplicatas sem `AppointmentID` são prováveis erros de exportação; mantemos a primeira para não perder informação de pacientes com alvo divergente de forma arbitrária.  
+- Idades acima de 100 são suspeitas (4 registros do mesmo paciente com 115 anos), mas há registros plausíveis (102 anos). Removê-las não é decisão de limpeza, e sim de domínio: documentamos e mantemos.
+
+**Alternativas consideradas:** Imputar idade negativa pela mediana — descartado; há apenas 1 caso e a origem é desconhecida. Remover idades > 100 — descartado; preservadas para análise posterior.
+
+---
+
 ### 2026-10-28 — Definição da métrica de negócio
 
 **Decisão:** Consultas recuperadas = faltas capturadas nos K agendamentos de maior risco × efeito incremental do contato (e). Resultado observado (faltas capturadas) separado da estimativa (consultas recuperadas e custo líquido). Comparação com contato aleatório de K pacientes. Detalhes e parâmetros na seção 7 do README.

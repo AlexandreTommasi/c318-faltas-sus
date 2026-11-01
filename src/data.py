@@ -34,21 +34,25 @@ def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
 def convert_types(df: pd.DataFrame) -> pd.DataFrame:
     """Converte tipos: patient_id → str, datas → datetime, no_show → int.
 
-    patient_id é convertido via notação inteira para evitar decimais espúrios
-    herdados do float64 original (5 linhas com casas decimais no CSV).
-    no_show: 1 = faltou (Yes), 0 = compareceu (No).
+    patient_id: IDs inteiros viram string sem ".0"; os 5 IDs com decimais
+    espúrios (ex.: 93779.52927) são preservados como string com o decimal,
+    mantendo-os distintos de IDs inteiros reais.
+    no_show: 1 = faltou (Yes), 0 = compareceu (No). Idempotente: se já for
+    numérico (CSV processado relido), mantém como está.
     """
     df = df.copy()
 
-    # patient_id: float → int → string (remove ".0" e preserva IDs longos)
+    # patient_id: inteiros → sem ".0"; decimais reais → mantém decimal
     df["patient_id"] = df["patient_id"].apply(
-        lambda x: str(int(x)) if x == x else str(x)
+        lambda x: str(int(x)) if pd.notna(x) and float(x).is_integer() else str(x)
     )
 
     df["scheduled_day"] = pd.to_datetime(df["scheduled_day"], utc=True)
     df["appointment_day"] = pd.to_datetime(df["appointment_day"], utc=True)
 
-    df["no_show"] = (df["no_show"] == "Yes").astype(int)
+    # idempotente: só converte se ainda não for inteiro (pandas 3.x usa StringDtype)
+    if not pd.api.types.is_integer_dtype(df["no_show"]):
+        df["no_show"] = (df["no_show"] == "Yes").astype(int)
 
     return df
 
@@ -69,12 +73,14 @@ def remove_invalid(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def drop_duplicates(df: pd.DataFrame) -> pd.DataFrame:
-    """Remove duplicatas ignorando appointment_id, mantendo a primeira ocorrência.
+    """Remove duplicatas ignorando appointment_id e no_show, mantendo a primeira.
 
-    618 linhas repetem todos os campos exceto appointment_id. Em 14 grupos
-    o alvo diverge; mantemos a primeira por consistência.
+    Excluir no_show do subset garante que nos 14 grupos com alvo divergente
+    (mesmo paciente, mesma consulta, no_show diferente) reste apenas 1 linha,
+    como descrito em docs/decisoes.md.
     """
-    chave = [c for c in df.columns if c != "appointment_id"]
+    excluir = {"appointment_id", "no_show"}
+    chave = [c for c in df.columns if c not in excluir]
     return df.drop_duplicates(subset=chave, keep="first")
 
 
@@ -95,7 +101,7 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     print(f"Após remover duplicatas:  {n2:>7}  (-{n1 - n2})")
 
     print(f"Total removido:           {n0 - n2:>7}  ({(n0 - n2) / n0:.2%})")
-    return df
+    return df.reset_index(drop=True)
 
 
 def save_processed(df: pd.DataFrame, path: str) -> None:

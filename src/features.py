@@ -6,8 +6,11 @@ import pandas as pd
 def build_features(df: pd.DataFrame) -> pd.DataFrame:
     """Cria e transforma atributos a partir do DataFrame limpo.
 
-    Inclui: tempo de espera (dias), faixas etárias, codificação
-    de variáveis categóricas, etc.
+    Atributos criados nesta etapa (issue #7):
+
+    - ``waiting_days``: dias de espera entre a data do agendamento e a data
+      da consulta (por dia, ignorando a hora de ``scheduled_day``).
+    - ``appointment_weekday``: dia da semana da consulta (0 = segunda).
 
     Args:
         df: DataFrame limpo retornado por data.clean.
@@ -15,7 +18,12 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame com atributos prontos para modelagem.
     """
-    ...
+    out = df.copy()
+    out["waiting_days"] = (
+        out["appointment_day"] - out["scheduled_day"].dt.normalize()
+    ).dt.days
+    out["appointment_weekday"] = out["appointment_day"].dt.dayofweek.astype("int8")
+    return out
 
 
 def encode_categoricals(df: pd.DataFrame) -> pd.DataFrame:

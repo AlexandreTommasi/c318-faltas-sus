@@ -62,3 +62,13 @@ Cada entrada segue o padrão:
 **Motivação:** Evita contar como recuperada uma falta que não seria evitada pelo contato e deixa explícito o que vem do modelo e o que vem de hipótese. Cenários de e: 10%, 20% e 30%, como hipóteses sem valor direto na literatura. Valor da vaga: cerca de US$ 37 (Ref. 4, dado histórico de fonte secundária). Custo por contato ainda sem valor.
 
 **Alternativas consideradas:** Fixar um único valor de e — descartado por falta de fonte. Levar e e o custo por contato ao professor na mentoria.
+
+---
+
+### 2026-11-01 — Regras de limpeza do dataset (issue #7)
+
+**Decisão:** Remover idades fora do intervalo 0–100 (8 linhas: 1 negativa e 7 acima de 100), consultas com data anterior ao agendamento (5 linhas) e duplicatas que repetem todas as colunas exceto `AppointmentID` (mantém a primeira ocorrência). Os 14 grupos de duplicatas em que o alvo diverge são removidos por inteiro (28 linhas). Total: 110.527 → 109.869 agendamentos. Implementado em `src/data.py`; as features `waiting_days` e `appointment_weekday` ficam em `src/features.py::build_features`.
+
+**Motivação:** O paciente com 115 anos aparece 4 vezes no mesmo conjunto, o que indica erro de registro; idades acima de 100 são implausíveis o suficiente para descartar sem perda relevante (7 linhas em 110 mil). Nas duplicatas com alvo divergente não há como saber qual rótulo é o correto, então remover o grupo inteiro evita treinar o modelo com exemplos contraditórios.
+
+**Alternativas consideradas:** Manter as idades altas ou truncá-las em 100 — descartado porque os valores já são suspeitos e o volume é desprezível. Manter a primeira linha dos grupos divergentes — descartado por escolher um rótulo arbitrário. Tratar as duplicatas como agendamentos duplos reais — descartado porque mesmo paciente, mesmo horário de marcação e mesma consulta indicam erro de sistema.

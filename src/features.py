@@ -3,27 +3,42 @@
 import pandas as pd
 
 
-def build_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Cria e transforma atributos a partir do DataFrame limpo.
+# sms_received: posterior ao agendamento — vazamento de dados (ver decisoes.md).
+# patient_id e appointment_id: identificadores, não features preditoras.
+FEATURES_EXCLUIDAS = ["patient_id", "appointment_id", "sms_received"]
 
-    Atributos criados nesta etapa (issue #7):
 
-    - ``waiting_days``: dias de espera entre a data do agendamento e a data
-      da consulta (por dia, ignorando a hora de ``scheduled_day``).
-    - ``appointment_weekday``: dia da semana da consulta (0 = segunda).
-
-    Args:
-        df: DataFrame limpo retornado por data.clean.
-
-    Returns:
-        DataFrame com atributos prontos para modelagem.
-    """
-    out = df.copy()
-    out["waiting_days"] = (
-        out["appointment_day"] - out["scheduled_day"].dt.normalize()
+def add_waiting_days(df: pd.DataFrame) -> pd.DataFrame:
+    """Adiciona 'waiting_days': dias entre o agendamento e a consulta (só datas)."""
+    df = df.copy()
+    df["waiting_days"] = (
+        df["appointment_day"].dt.normalize() - df["scheduled_day"].dt.normalize()
     ).dt.days
-    out["appointment_weekday"] = out["appointment_day"].dt.dayofweek.astype("int8")
-    return out
+    return df
+
+
+def add_weekday(df: pd.DataFrame) -> pd.DataFrame:
+    """Adiciona 'weekday': dia da semana da consulta (0=segunda … 6=domingo)."""
+    df = df.copy()
+    df["weekday"] = df["appointment_day"].dt.dayofweek
+    return df
+
+
+def add_same_day(df: pd.DataFrame) -> pd.DataFrame:
+    """Adiciona 'same_day': 1 se a consulta é no mesmo dia do agendamento."""
+    df = df.copy()
+    df["same_day"] = (
+        df["appointment_day"].dt.normalize() == df["scheduled_day"].dt.normalize()
+    ).astype(int)
+    return df
+
+
+def build_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Aplica add_waiting_days, add_weekday e add_same_day ao DataFrame limpo."""
+    df = add_waiting_days(df)
+    df = add_weekday(df)
+    df = add_same_day(df)
+    return df
 
 
 def encode_categoricals(df: pd.DataFrame) -> pd.DataFrame:
@@ -38,7 +53,7 @@ def encode_categoricals(df: pd.DataFrame) -> pd.DataFrame:
     ...
 
 
-def split_features_target(df: pd.DataFrame, target_col: str = "No-show"):
+def split_features_target(df: pd.DataFrame, target_col: str = "no_show"):
     """Separa atributos (X) e variável-alvo (y).
 
     Args:

@@ -62,3 +62,19 @@ Cada entrada segue o padrão:
 **Motivação:** Evita contar como recuperada uma falta que não seria evitada pelo contato e deixa explícito o que vem do modelo e o que vem de hipótese. Cenários de e: 10%, 20% e 30%, como hipóteses sem valor direto na literatura. Valor da vaga: cerca de US$ 37 (Ref. 4, dado histórico de fonte secundária). Custo por contato ainda sem valor.
 
 **Alternativas consideradas:** Fixar um único valor de e — descartado por falta de fonte. Levar e e o custo por contato ao professor na mentoria.
+
+---
+
+### 2026-10-31 — Limpeza do dataset (src/data.py)
+
+**Decisão:** Remover linhas com `age < 0` (1 linha) e linhas em que `appointment_day < scheduled_day` por data (5 linhas com espera negativa). Remover duplicatas excluindo `appointment_id` e `no_show` do subset, mantendo a primeira ocorrência (632 linhas removidas; inclui os 14 grupos com alvo divergente, resolvidos corretamente). Shape final: 109.889 linhas × 14 colunas. Manter idades acima de 100 anos.
+
+**Motivação:**  
+- Idades negativas são erro de registro sem valor de imputação plausível.  
+- Espera negativa (consulta marcada antes do agendamento) é erro de sistema; não representa comportamento real.  
+- Excluir `no_show` do subset de deduplicação garante que grupos com alvo divergente (mesmos dados clínicos, `no_show` diferente) fiquem com uma única linha, evitando contradições no treino.  
+- Idades acima de 100 são suspeitas (4 registros do mesmo paciente com 115 anos), mas há registros plausíveis (102 anos). Removê-las não é decisão de limpeza, e sim de domínio: documentamos e mantemos.
+
+**Nota:** O CSV processado (`data/processed/consultas_limpas.csv`) perde os tipos (datas e `patient_id` voltam como string genérica, `no_show` volta como int64 via CSV). Quem reler o CSV deve chamar `convert_types()` novamente — a função é idempotente para `no_show` já numérico.
+
+**Alternativas consideradas:** Imputar idade negativa pela mediana — descartado; há apenas 1 caso e a origem é desconhecida. Remover idades > 100 — descartado; preservadas para análise posterior. Incluir `no_show` no subset de deduplicação — descartado; deixa 14 grupos com alvo divergente no dataset.

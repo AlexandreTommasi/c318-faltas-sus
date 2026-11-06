@@ -78,3 +78,15 @@ Cada entrada segue o padrão:
 **Nota:** O CSV processado (`data/processed/consultas_limpas.csv`) perde os tipos (datas e `patient_id` voltam como string genérica, `no_show` volta como int64 via CSV). Quem reler o CSV deve chamar `convert_types()` novamente — a função é idempotente para `no_show` já numérico.
 
 **Alternativas consideradas:** Imputar idade negativa pela mediana — descartado; há apenas 1 caso e a origem é desconhecida. Remover idades > 100 — descartado; preservadas para análise posterior. Incluir `no_show` no subset de deduplicação — descartado; deixa 14 grupos com alvo divergente no dataset.
+
+---
+
+### 2026-11-05 — Histórico, baseline e EDA das sprints 2–3
+
+**Decisão:** Histórico só inclui dias de consulta estritamente anteriores ao dia do agendamento. Ausência de histórico é representada por contagem e taxa zero. EDA nova usa apenas treino por paciente, seed 42. Pré-processamento é ajustado dentro do pipeline de treino. A checagem temporal usa corte em 25/05 e exclui do treino desfechos ainda pendentes.
+
+**Motivação:** Não há horário de atendimento, então incluir consultas do mesmo dia poderia vazar o desfecho. A janela curta limita a cobertura e trunca o teste temporal. `same_day` fica fora da lista preditiva por redundância com espera zero; as variáveis de histórico seguem como candidatas, com ablação futura diante da correlação elevada entre contagem e taxa de faltas.
+
+**Alternativas consideradas:** Histórico por ordem de agendamento ou por `shift` — descartado porque consultas agendadas antes podem ainda estar pendentes. Escolha de atributos pela correlação no teste — descartada para preservar a avaliação. Empates do dummy por ordem da linha — substituídos pela captura esperada sob desempate aleatório.
+
+**Evidências:** [Relatório S2–S3](sprints-2-3.md) e artefatos em `reports/sprints-2-3/`. AP é a definição adotada para PR-AUC. Métricas de recuperação permanecem hipóteses de intervenção, não efeitos observados.

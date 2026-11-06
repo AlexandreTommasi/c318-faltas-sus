@@ -1,0 +1,118 @@
+{
+  "patient_split": {
+    "dummy": {
+      "accuracy": 0.7971491722675809,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "pr_auc_ap": 0.20285082773241914,
+      "confusion_matrix": [
+        [
+          17672,
+          0
+        ],
+        [
+          4497,
+          0
+        ]
+      ],
+      "n_test": 22169,
+      "prevalence": 0.20285082773241914,
+      "contacts": 4434,
+      "captured_no_shows": 899.4405701655464,
+      "precision_at_20": 0.20285082773241914,
+      "recall_at_20": 0.20000902160674816,
+      "random_expected_no_shows": 899.4405701655464
+    },
+    "logistic": {
+      "accuracy": 0.7938562858045017,
+      "precision": 0.3472803347280335,
+      "recall": 0.018456748943740272,
+      "f1": 0.03505067567567568,
+      "roc_auc": 0.6550008365317335,
+      "pr_auc_ap": 0.3036293854496823,
+      "confusion_matrix": [
+        [
+          17516,
+          156
+        ],
+        [
+          4414,
+          83
+        ]
+      ],
+      "n_test": 22169,
+      "prevalence": 0.20285082773241914,
+      "contacts": 4434,
+      "captured_no_shows": 1542.0,
+      "precision_at_20": 0.34776725304465494,
+      "recall_at_20": 0.342895263509006,
+      "random_expected_no_shows": 899.4405701655464
+    }
+  },
+  "temporal_split": {
+    "dummy": {
+      "accuracy": 0.8820499388859787,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "pr_auc_ap": 0.1179500611140213,
+      "confusion_matrix": [
+        [
+          20206,
+          0
+        ],
+        [
+          2702,
+          0
+        ]
+      ],
+      "n_test": 22908,
+      "prevalence": 0.1179500611140213,
+      "contacts": 4582,
+      "captured_no_shows": 540.4471800244456,
+      "precision_at_20": 0.1179500611140213,
+      "recall_at_20": 0.20001746114894361,
+      "random_expected_no_shows": 540.4471800244456
+    },
+    "logistic": {
+      "accuracy": 0.8830539549502358,
+      "precision": 0.592,
+      "recall": 0.027387120651369355,
+      "f1": 0.05235231694375663,
+      "roc_auc": 0.6067307528166765,
+      "pr_auc_ap": 0.2064596316424896,
+      "confusion_matrix": [
+        [
+          20155,
+          51
+        ],
+        [
+          2628,
+          74
+        ]
+      ],
+      "n_test": 22908,
+      "prevalence": 0.1179500611140213,
+      "contacts": 4582,
+      "captured_no_shows": 861.0,
+      "precision_at_20": 0.18790920995198604,
+      "recall_at_20": 0.31865284974093266,
+      "random_expected_no_shows": 540.4471800244456
+    }
+  },
+  "metadata": {
+    "rows": 109889,
+    "patients": 62298,
+    "train_rows": 87720,
+    "test_rows": 22169,
+    "temporal_train_rows": 70856,
+    "temporal_test_rows": 22908,
+    "seed": 42,
+    "temporal_cutoff": "2016-05-25",
+    "pr_auc_definition": "average_precision_score (AP)",
+    "history_coverage": 0.2796822247904704
+  }
+}

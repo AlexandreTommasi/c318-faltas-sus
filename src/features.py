@@ -45,6 +45,51 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
 NUMERIC_FEATURES = ["age", "bolsa_familia", "hypertension", "diabetes",
                     "alcoholism", "handicap", "waiting_days"]
 CATEGORICAL_FEATURES = ["gender", "neighbourhood", "weekday"]
+HISTORY_FEATURES = ["previous_appointments", "previous_no_shows", "previous_no_show_rate", "has_history"]
+
+
+def add_patient_history(df: pd.DataFrame) -> pd.DataFrame:
+    """Adiciona histórico de faltas disponível no momento do agendamento.
+
+    Para cada agendamento, conta consultas do mesmo paciente com
+    appointment_day estritamente anterior ao scheduled_day (por data).
+    Consultas no mesmo dia e futuras não entram — evita vazamento de dados.
+
+    Tolerante a linhas fora de ordem e a índice externo não sequencial.
+    """
+    import numpy as np
+
+    result = df.copy()
+    n = len(df)
+    counts = np.zeros(n, dtype=int)
+    no_shows = np.zeros(n, dtype=int)
+    # reset_index garante índices posicionais 0..n-1 para counts/no_shows
+    work = df.reset_index(drop=True)
+    for _, grp in work.groupby("patient_id", sort=False):
+        completed = (
+            grp.groupby("appointment_day")["no_show"]
+            .agg(["count", "sum"])
+            .sort_index()
+        )
+        dates = completed.index.normalize().asi8
+        positions = np.searchsorted(
+            dates,
+            grp["scheduled_day"].dt.normalize().array.asi8,
+            side="left",
+        )
+        cum_count = np.r_[0, completed["count"].cumsum().to_numpy()]
+        cum_shows = np.r_[0, completed["sum"].cumsum().to_numpy()]
+        counts[grp.index] = cum_count[positions]
+        no_shows[grp.index] = cum_shows[positions]
+
+    result["previous_appointments"] = counts
+    result["previous_no_shows"] = no_shows
+    result["previous_no_show_rate"] = np.divide(
+        no_shows, counts, out=np.zeros(n, dtype=float), where=counts > 0
+    )
+    result["has_history"] = (counts > 0).astype(int)
+    return result
+
 
 def encode_categoricals(df: pd.DataFrame):
     """Retorna um ColumnTransformer não ajustado; fit apenas no treino."""

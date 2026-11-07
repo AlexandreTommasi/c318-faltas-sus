@@ -228,3 +228,16 @@ jupyter notebook
 9. Beltrame, S. M. et al. *Absenteísmo de usuários como fator de desperdício: desafio para sustentabilidade em sistema universal de saúde*. Saúde em Debate, 2019, 43(123), 1015–1030. https://doi.org/10.1590/0103-1104201912303
 10. Dantas, L. F. et al. *No-shows in appointment scheduling – a systematic literature review*. Health Policy, 2018, 122(4), 412–421. https://doi.org/10.1016/j.healthpol.2018.02.002 (texto completo não consultado; os valores de 23% e 27,8% foram conferidos na citação feita por Beltrame et al., 2019)
 11. Santos, J. S. *Absenteísmo dos usuários em consultas e procedimentos especializados agendados no SUS: um estudo em um município baiano*. Dissertação (Mestrado), Universidade Federal da Bahia, 2008. (não consultada diretamente; citada na Referência 2)
+
+## 12. Entrega das sprints 2 e 3
+
+Tarefas do Fernando (#8 e #12): baseline ingênuo, regressão logística e
+seleção inicial de atributos: [resultados, perguntas de negócio e limitações](docs/sprints-2-3.md).
+
+```bash
+python -m unittest discover -s tests -v
+python -m src.analysis
+```
+
+O segundo comando lê o CSV original e gera métricas, tabelas e gráficos agregados
+em `reports/sprints-2-3/`. Os notebooks 01 e 03 permitem acompanhar a análise.

@@ -41,26 +41,25 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def encode_categoricals(df: pd.DataFrame) -> pd.DataFrame:
-    """Aplica one-hot encoding ou ordinal encoding nas colunas categóricas.
+# Seleção explícita impede inclusão acidental de alvo, datas e identificadores.
+NUMERIC_FEATURES = ["age", "bolsa_familia", "hypertension", "diabetes",
+                    "alcoholism", "handicap", "waiting_days"]
+CATEGORICAL_FEATURES = ["gender", "neighbourhood", "weekday"]
 
-    Args:
-        df: DataFrame com atributos construídos.
+def encode_categoricals(df: pd.DataFrame):
+    """Retorna um ColumnTransformer não ajustado; fit apenas no treino."""
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-    Returns:
-        DataFrame com colunas numéricas.
-    """
-    ...
+    numeric = [c for c in NUMERIC_FEATURES if c in df]
+    categorical = [c for c in CATEGORICAL_FEATURES if c in df]
+    return ColumnTransformer([
+        ("numeric", StandardScaler(), numeric),
+        ("categorical", OneHotEncoder(handle_unknown="ignore"), categorical),
+    ], remainder="drop")
 
 
 def split_features_target(df: pd.DataFrame, target_col: str = "no_show"):
-    """Separa atributos (X) e variável-alvo (y).
-
-    Args:
-        df: DataFrame completo com atributos e target.
-        target_col: Nome da coluna alvo.
-
-    Returns:
-        Tupla (X, y) como DataFrames/Series do pandas.
-    """
-    ...
+    """Separa somente atributos aprovados; same_day é redundante com espera."""
+    columns = NUMERIC_FEATURES + CATEGORICAL_FEATURES
+    return df.loc[:, columns].copy(), df[target_col].copy()

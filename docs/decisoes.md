@@ -78,3 +78,11 @@ Cada entrada segue o padrão:
 **Nota:** O CSV processado (`data/processed/consultas_limpas.csv`) perde os tipos (datas e `patient_id` voltam como string genérica, `no_show` volta como int64 via CSV). Quem reler o CSV deve chamar `convert_types()` novamente — a função é idempotente para `no_show` já numérico.
 
 **Alternativas consideradas:** Imputar idade negativa pela mediana — descartado; há apenas 1 caso e a origem é desconhecida. Remover idades > 100 — descartado; preservadas para análise posterior. Incluir `no_show` no subset de deduplicação — descartado; deixa 14 grupos com alvo divergente no dataset.
+
+---
+
+### 2026-11-07 — Baseline e seleção inicial (Fernando, #8 e #12)
+
+**Decisão:** Dummy e regressão logística com partição por paciente, seed 42, e checagem temporal em 25/05. Encoder e escala ajustados apenas no treino. Correlações de Spearman somente no treino; categóricas recebem one-hot. Identificadores, SMS, datas brutas e same_day ficam fora dos preditores.
+
+**Motivação:** Preservar a avaliação e evitar informação posterior ao agendamento. Histórico do paciente permanece na tarefa #9 do Alexandre. EDA e respostas de negócio permanecem nas tarefas #11 e #10 do Matheus e Antonio.

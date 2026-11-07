@@ -45,41 +45,13 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
 NUMERIC_FEATURES = ["age", "bolsa_familia", "hypertension", "diabetes",
                     "alcoholism", "handicap", "waiting_days"]
 CATEGORICAL_FEATURES = ["gender", "neighbourhood", "weekday"]
-HISTORY_FEATURES = ["previous_appointments", "previous_no_shows", "previous_no_show_rate"]
-
-
-def add_patient_history(df: pd.DataFrame) -> pd.DataFrame:
-    """Histórico disponível no agendamento; consulta só conclui ao fim do dia.
-
-    Busca estritamente dias anteriores ao dia de agendamento, pois o dataset
-    não informa o horário da consulta. Empates nunca observam o próprio alvo.
-    A entrada pode estar fora de ordem e ter índices repetidos.
-    """
-    import numpy as np
-
-    result = df.copy()
-    counts = np.zeros(len(df), dtype=int)
-    misses = np.zeros(len(df), dtype=int)
-    # Índice posicional próprio preserva ordem e índice externos.
-    work = df.reset_index(drop=True)
-    for _, appointments in work.groupby("patient_id", sort=False):
-        completed = appointments.groupby("appointment_day")["no_show"].agg(["count", "sum"]).sort_index()
-        dates = completed.index.normalize().asi8
-        positions = np.searchsorted(dates, appointments["scheduled_day"].dt.normalize().array.asi8, side="left")
-        counts[appointments.index] = np.r_[0, completed["count"].cumsum().to_numpy()][positions]
-        misses[appointments.index] = np.r_[0, completed["sum"].cumsum().to_numpy()][positions]
-    result["previous_appointments"] = counts
-    result["previous_no_shows"] = misses
-    result["previous_no_show_rate"] = np.divide(misses, counts, out=np.zeros(len(df)), where=counts > 0)
-    return result
-
 
 def encode_categoricals(df: pd.DataFrame):
     """Retorna um ColumnTransformer não ajustado; fit apenas no treino."""
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-    numeric = [c for c in NUMERIC_FEATURES + HISTORY_FEATURES if c in df]
+    numeric = [c for c in NUMERIC_FEATURES if c in df]
     categorical = [c for c in CATEGORICAL_FEATURES if c in df]
     return ColumnTransformer([
         ("numeric", StandardScaler(), numeric),
@@ -90,5 +62,4 @@ def encode_categoricals(df: pd.DataFrame):
 def split_features_target(df: pd.DataFrame, target_col: str = "no_show"):
     """Separa somente atributos aprovados; same_day é redundante com espera."""
     columns = NUMERIC_FEATURES + CATEGORICAL_FEATURES
-    columns += [c for c in HISTORY_FEATURES if c in df]
     return df.loc[:, columns].copy(), df[target_col].copy()

@@ -231,7 +231,7 @@ jupyter notebook
 
 ## 12. Entrega das sprints 2 e 3
 
-Baseline ingênuo e regressão logística, histórico sem vazamento, EDA no treino e
+Tarefas do Fernando (#8 e #12): baseline ingênuo, regressão logística e
 seleção inicial de atributos: [resultados, perguntas de negócio e limitações](docs/sprints-2-3.md).
 
 ```bash

@@ -81,12 +81,8 @@ Cada entrada segue o padrão:
 
 ---
 
-### 2026-11-05 — Histórico, baseline e EDA das sprints 2–3
+### 2026-11-07 — Baseline e seleção inicial (Fernando, #8 e #12)
 
-**Decisão:** Histórico só inclui dias de consulta estritamente anteriores ao dia do agendamento. Ausência de histórico é representada por contagem e taxa zero. EDA nova usa apenas treino por paciente, seed 42. Pré-processamento é ajustado dentro do pipeline de treino. A checagem temporal usa corte em 25/05 e exclui do treino desfechos ainda pendentes.
+**Decisão:** Dummy e regressão logística com partição por paciente, seed 42, e checagem temporal em 25/05. Encoder e escala ajustados apenas no treino. Correlações de Spearman somente no treino; categóricas recebem one-hot. Identificadores, SMS, datas brutas e same_day ficam fora dos preditores.
 
-**Motivação:** Não há horário de atendimento, então incluir consultas do mesmo dia poderia vazar o desfecho. A janela curta limita a cobertura e trunca o teste temporal. `same_day` fica fora da lista preditiva por redundância com espera zero; as variáveis de histórico seguem como candidatas, com ablação futura diante da correlação elevada entre contagem e taxa de faltas.
-
-**Alternativas consideradas:** Histórico por ordem de agendamento ou por `shift` — descartado porque consultas agendadas antes podem ainda estar pendentes. Escolha de atributos pela correlação no teste — descartada para preservar a avaliação. Empates do dummy por ordem da linha — substituídos pela captura esperada sob desempate aleatório.
-
-**Evidências:** [Relatório S2–S3](sprints-2-3.md) e artefatos em `reports/sprints-2-3/`. AP é a definição adotada para PR-AUC. Métricas de recuperação permanecem hipóteses de intervenção, não efeitos observados.
+**Motivação:** Preservar a avaliação e evitar informação posterior ao agendamento. Histórico do paciente permanece na tarefa #9 do Alexandre. EDA e respostas de negócio permanecem nas tarefas #11 e #10 do Matheus e Antonio.

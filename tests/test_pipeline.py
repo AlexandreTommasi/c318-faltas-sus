@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.dummy import DummyClassifier
 
-from src.features import add_patient_history, split_features_target, encode_categoricals
+from src.features import split_features_target, encode_categoricals
 from src.models import split_by_patient, split_temporal
 from src.evaluate import compute_metrics
 
@@ -18,16 +18,6 @@ class PipelineTests(unittest.TestCase):
             'appointment_day': pd.to_datetime(['2016-05-02', '2016-05-02', '2016-05-04', '2016-05-04'], utc=True),
             'no_show': [1, 0, 1, 1],
         })
-
-    def test_history_excludes_same_day_and_future(self):
-        df = self.fixture().iloc[[2, 0, 3, 1]].copy()
-        df.index = [0, 0, 1, 1]
-        result = add_patient_history(df)
-        self.assertEqual(result.previous_appointments.tolist(), [2, 0, 0, 0])
-        self.assertEqual(result.previous_no_shows.tolist(), [1, 0, 0, 0])
-        changed = df.copy()
-        changed.iloc[0, changed.columns.get_loc('no_show')] = 0
-        pd.testing.assert_frame_equal(result.filter(like='previous_'), add_patient_history(changed).filter(like='previous_'))
 
     def test_cleaning_preserves_target_and_removes_invalid_rows(self):
         from src.data import clean

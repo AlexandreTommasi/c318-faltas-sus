@@ -57,7 +57,8 @@ def make_strategy(strategy):
     ])
 
 
-def compare_strategies(df, n_splits=5):
+def compare_strategies(df, n_splits=5, on_validation=None):
+    """Compare fixed strategies; optionally consume held-out fold scores in memory."""
     train, test = split_by_patient(df)
     development = df.iloc[train].reset_index(drop=True)
     X, y = split_features_target(development)
@@ -85,6 +86,9 @@ def compare_strategies(df, n_splits=5):
             model.fit(X.iloc[fit], y.iloc[fit])
             metrics = compute_metrics(model, X.iloc[validation], y.iloc[validation])
             records.append({"strategy": strategy, "fold": fold, **metrics})
+            if on_validation is not None:
+                scores = model.predict_proba(X.iloc[validation])[:, list(model.classes_).index(1)]
+                on_validation(strategy, fold, y.iloc[validation].to_numpy(), scores)
     results = pd.DataFrame(records)
     summary = results.groupby("strategy", sort=False)[list(METRICS)].agg(["mean", "std"])
     summary.columns = ["_".join(column) for column in summary.columns]

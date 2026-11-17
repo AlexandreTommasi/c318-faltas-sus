@@ -19,6 +19,7 @@
 - EDA agregada do treino (S3): `python -m src.eda` → `reports/sprints-3-4/eda/`
 - Comparação de balanceamento (S4): `python -m src.imbalance` → `reports/sprints-3-4/imbalance/`
 - Figuras a partir das tabelas congeladas: `python -m src.sprint_plots` → `reports/sprints-3-4/figures/`
+- Curvas ROC/PR e matrizes de confusão em validação cruzada (S5): `python -m src.validation_curves` → `reports/sprint-5/evaluation/`; figuras: `python -m src.validation_plots` → `reports/sprint-5/figures/`
 - Rodar comandos a partir da raiz do repositório (pacote `src`).
 
 ## Guardrails de vazamento e avaliação
@@ -42,3 +43,7 @@
 - Figuras e notebooks de relatório leem apenas artefatos agregados congelados;
   não publicar registros individuais nem deixar outputs de notebook com dados
   brutos commitados.
+- S5: curvas e matrizes vêm só das validações do treino (mesmos folds da S4, limiar fixo
+  0,5, sem ajuste); só agregados são salvos (sem scores/rótulos por indivíduo); curvas
+  limitadas a 501 pontos são só para exibição, métricas exatas não se recalculam delas;
+  `src.validation_plots` lê apenas os agregados.

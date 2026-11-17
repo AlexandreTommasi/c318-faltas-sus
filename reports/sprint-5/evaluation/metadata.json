@@ -1,0 +1,108 @@
+{
+  "seed": 42,
+  "cv": "StratifiedGroupKFold",
+  "n_splits": 5,
+  "development_rows": 87720,
+  "reserved_test_rows": 22169,
+  "test_evaluated": false,
+  "threshold": 0.5,
+  "contact_fraction": 0.2,
+  "selection_metric": "pr_auc_ap_mean",
+  "pr_auc_definition": "average_precision_score",
+  "smote_variant": "SMOTENC before one-hot; categorical values are not interpolated",
+  "smote_discrete_features": [
+    "bolsa_familia",
+    "hypertension",
+    "diabetes",
+    "alcoholism",
+    "handicap",
+    "gender",
+    "neighbourhood",
+    "weekday"
+  ],
+  "features": [
+    "age",
+    "bolsa_familia",
+    "hypertension",
+    "diabetes",
+    "alcoholism",
+    "handicap",
+    "waiting_days",
+    "gender",
+    "neighbourhood",
+    "weekday"
+  ],
+  "history_included": false,
+  "folds": [
+    {
+      "fold": 1,
+      "train_rows": 70175,
+      "validation_rows": 17545,
+      "train_patients": 39859,
+      "validation_patients": 9979,
+      "shared_patients": 0,
+      "train_prevalence": 0.20057000356252228,
+      "validation_prevalence": 0.2005699629524081
+    },
+    {
+      "fold": 2,
+      "train_rows": 70177,
+      "validation_rows": 17543,
+      "train_patients": 39840,
+      "validation_patients": 9998,
+      "shared_patients": 0,
+      "train_prevalence": 0.20057853712754892,
+      "validation_prevalence": 0.20053582625548652
+    },
+    {
+      "fold": 3,
+      "train_rows": 70176,
+      "validation_rows": 17544,
+      "train_patients": 39892,
+      "validation_patients": 9946,
+      "shared_patients": 0,
+      "train_prevalence": 0.2005671454628363,
+      "validation_prevalence": 0.2005813953488372
+    },
+    {
+      "fold": 4,
+      "train_rows": 70176,
+      "validation_rows": 17544,
+      "train_patients": 39866,
+      "validation_patients": 9972,
+      "shared_patients": 0,
+      "train_prevalence": 0.2005671454628363,
+      "validation_prevalence": 0.2005813953488372
+    },
+    {
+      "fold": 5,
+      "train_rows": 70176,
+      "validation_rows": 17544,
+      "train_patients": 39895,
+      "validation_patients": 9943,
+      "shared_patients": 0,
+      "train_prevalence": 0.2005671454628363,
+      "validation_prevalence": 0.2005813953488372
+    }
+  ],
+  "issue": 19,
+  "evaluation": "out-of-fold development validation, not final test evaluation",
+  "positive_class": "no_show=1 (missed appointment)",
+  "curve_scope": "one curve per strategy and validation fold; no pooled score curve",
+  "curve_display": {
+    "max_points_per_curve": 501,
+    "sampling": "evenly spaced curve indices, retaining both endpoints",
+    "metrics_from_display_points": false
+  },
+  "confusion_matrix": {
+    "rows": "actual [0=attended, 1=missed]",
+    "columns": "predicted [0=attended, 1=missed]",
+    "aggregation": "sum of validation fold counts; each development row once",
+    "decision_rule": "existing classifier predict at fixed threshold 0.5"
+  },
+  "uncertainty": "sample standard deviation across folds, not confidence intervals",
+  "model_selection_performed": false,
+  "threshold_tuning_performed": false,
+  "scores_calibrated": false,
+  "raw_sha256": "9132d3e7d0246617df9041d3764f20ad6f08e7b0d9f0997fa254fc5e52eda27d"
+}

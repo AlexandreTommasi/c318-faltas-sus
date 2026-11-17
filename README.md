@@ -275,3 +275,16 @@ nas quatro estratégias — diferença pequena e sem evidência de superioridade
 recall a 0,5 sobe para ~56% com `class_weight`/reamostragem à custa de precisão,
 enquanto o recall@20% permanece ~35%. Scores balanceados não são probabilidades
 calibradas. Detalhes e ressalvas nos notebooks.
+
+## 14. Entrega da sprint 5
+
+Tarefa #19 do Matheus: curvas ROC, precisão-recall e matrizes de confusão das
+quatro estratégias de balanceamento, na validação cruzada do treino (teste
+reservado). Detalhes em [`docs/sprint-5.md`](docs/sprint-5.md) e no notebook
+[`notebooks/04_avaliacao.ipynb`](notebooks/04_avaliacao.ipynb).
+
+```bash
+.venv/bin/python -m src.validation_curves   # reports/sprint-5/evaluation/
+.venv/bin/python -m src.validation_plots    # reports/sprint-5/figures/
+.venv/bin/python -m unittest discover -s tests -v
+```

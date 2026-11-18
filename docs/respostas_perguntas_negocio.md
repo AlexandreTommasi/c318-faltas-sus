@@ -14,7 +14,7 @@ Análise descritiva do dataset *Medical Appointment No Shows* após a limpeza de
 | 2. Bolsa Família e saúde | Bolsa Família tem mais faltas. Hipertensão e diabetes têm menos, e alcoolismo não muda |
 | 3. Tempo de espera | É a relação mais forte: 4,6% de faltas no mesmo dia contra cerca de 33% com mais de 30 dias de espera |
 | 4. Dia da semana | Diferença pequena, com sexta-feira no topo |
-| 5. Histórico de faltas | Efeito pequeno neste dataset |
+| 5. Histórico de faltas | Quem tem histórico e nunca faltou falta bem menos (13,5%); quem já faltou (21,4%) fica no nível de quem não tem histórico (21,7%) |
 | 6. SMS | Dentro de cada faixa de espera, quem recebeu SMS faltou menos, e a diferença cresce com a espera |
 
 ## P1. Taxa geral e perfil de quem falta
@@ -90,16 +90,18 @@ Análise descritiva do dataset *Medical Appointment No Shows* após a limpeza de
 
 ## P5. Histórico de faltas do paciente
 
-O histórico considera apenas consultas anteriores do mesmo paciente (`AppointmentDay` anterior ao `ScheduledDay` da linha atual), para não usar informação do futuro.
+O histórico usa `add_patient_history()` (`src/features.py`) e considera apenas consultas do mesmo paciente com **data estritamente anterior** à data do agendamento da linha atual. Consultas marcadas para o mesmo dia do agendamento não entram, porque o resultado delas ainda não é conhecido naquele momento (regra registrada em `docs/decisoes.md`).
 
 | Grupo | n | Taxa de falta |
 |---|---:|---:|
-| Sem histórico | 48.520 | 19,84% |
-| Nunca faltou antes | 47.990 | 20,19% |
-| Já faltou antes | 13.379 | 20,75% |
+| Sem histórico | 79.155 | 21,69% |
+| Nunca faltou antes | 20.881 | 13,46% |
+| Já faltou antes | 9.853 | 21,44% |
 
-- Quem já faltou antes tem taxa 0,56 a 0,91 ponto percentual maior que os outros grupos. É uma diferença pequena.
-- **Limitação importante:** as consultas do dataset cobrem só cerca de 6 semanas (29/04 a 08/06/2016), e 44% das linhas (48.520) não têm nenhuma consulta anterior dentro dessa janela. Com tão pouco histórico observável, o efeito do passado do paciente fica subestimado. Isso não contradiz a literatura, que aponta o histórico como fator relevante em bases mais longas (Referência 7), mas significa que aqui ele deve ser testado no modelo antes de ser dado como importante.
+- Quem tem histórico e **nunca faltou** tem taxa de 13,46%, cerca de 8 pontos percentuais abaixo de quem já faltou (+7,98 p.p. para o grupo "já faltou antes").
+- Quem já faltou antes (21,44%) fica praticamente no mesmo nível de quem não tem histórico (21,69%, diferença de −0,25 p.p.). Nesta base, o histórico ajuda sobretudo a identificar quem tem **baixo** risco, e não quem tem risco mais alto que o dos pacientes novos.
+- **Hipótese não testada:** quem tem consultas anteriores concluídas pode também ter agendamentos com espera mais curta ou outro perfil de idade, o que explicaria parte da diferença. Para afirmar, seria preciso comparar dentro de cada faixa de espera.
+- **Limitação importante:** as consultas do dataset cobrem só cerca de 6 semanas (29/04 a 08/06/2016), e 72% das linhas (79.155) não têm nenhuma consulta anterior dentro dessa janela. Em uma base mais longa, o histórico tenderia a estar disponível para mais pacientes (Referência 7 aponta o histórico como fator relevante na literatura).
 
 ## P6. SMS, controlando o tempo de espera
 
@@ -127,10 +129,11 @@ Nenhum agendamento com 0 dias ou 1 a 2 dias de espera recebeu SMS, então a comp
 | Taxa de faltas no mesmo dia | 4,65% | 4,63% |
 | Taxa com SMS | 27,57% | 27,57% |
 
-Os números do bruto batem com o dicionário. O dicionário cita 618 duplicatas e a função atual remove 632. A diferença de 14 coincide com os 14 grupos em que o alvo diverge entre as linhas repetidas, o que sugere que a função ignora o alvo ao comparar. Falta o Matheus confirmar e registrar qual linha é mantida quando o alvo diverge.
+Os números do bruto batem com o dicionário. O dicionário cita 618 duplicatas e a função atual remove 632. A diferença de 14 coincide com os 14 grupos em que o alvo diverge entre as linhas repetidas. Conforme `docs/decisoes.md`, a deduplicação não considera `appointment_id` nem `no_show` na comparação e mantém a primeira ocorrência de cada grupo.
 
 ## Implicações para as próximas etapas
 
-- **Variáveis mais promissoras para o modelo:** dias de espera (forte), idade (forte), Bolsa Família (moderada) e bairro (moderada, com cuidado nos de n pequeno).
-- **Variáveis fracas nesta análise:** sexo, alcoolismo, dia da semana e, nesta janela de dados, histórico de faltas.
+- **Variáveis mais promissoras para o modelo:** dias de espera (forte), idade (forte), histórico de faltas (forte para separar quem nunca faltou, com cobertura de só 28% das linhas), Bolsa Família (moderada) e bairro (moderada, com cuidado nos de n pequeno).
+- **Variáveis fracas nesta análise:** sexo, alcoolismo e dia da semana.
+- **Histórico nos modelos:** os modelos atuais da `main` ainda não usam as variáveis de `add_patient_history()`. Vale testá-las, respeitando a regra de data estritamente anterior.
 - **Sobre os agendamentos do mesmo dia:** como quase não faltam, é esperado que o corte dos 20% de maior risco seja formado sobretudo por agendamentos com espera longa. Isso ainda precisa ser verificado com o modelo.

@@ -1,5 +1,7 @@
 # Agenda sem desperdício: previsão de faltas em consultas do SUS
 
+Entrega de Fernando: [S4 (#16) e S5 (#20): validação, hiperparâmetros e limiar](docs/sprints-4-5.md).
+
 Projeto da disciplina **C318 – Fundamentos de Machine Learning** (Inatel, Eng. de Software e Eng. de Computação), prof. Ricardo Augusto. Entregável da NP2.
 
 > Status: versão 4.2, de 29/out/2026. Base: versão 4.1. Integra o README inicial do repositório, a auditoria das fontes e o dicionário de dados do Matheus (`docs/dicionario_dados.md`, issue #3). Os números do dataset vêm desse dicionário e serão reproduzidos no notebook `01_eda.ipynb`.

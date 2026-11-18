@@ -81,6 +81,16 @@ Cada entrada segue o padrão:
 
 ---
 
+### 2026-11-07 — Critério de elegibilidade do histórico (#9)
+
+**Decisão:** Para cada agendamento, o histórico do paciente considera somente consultas do mesmo paciente cuja `appointment_day` (data da consulta) é **estritamente anterior** ao `scheduled_day` (data do agendamento) do registro atual, comparando apenas a data (sem horário).
+
+**Motivação:** A previsão é feita no momento do agendamento. Consultas com `appointment_day` igual ou posterior ao `scheduled_day` ainda não ocorreram nesse instante — incluí-las seria vazamento de dados. Como o dataset não informa o horário da consulta, consultas agendadas para o mesmo dia também são excluídas por precaução.
+
+**Alternativas consideradas:** Usar `appointment_day <= scheduled_day` — descartado; uma consulta no mesmo dia pode ocorrer no futuro dependendo do horário. Usar `appointment_day < scheduled_day` com horário exato — inviável, o dataset não tem essa granularidade.
+
+---
+
 ### 2026-11-07 — Baseline e seleção inicial (Fernando, #8 e #12)
 
 **Decisão:** Dummy e regressão logística com partição por paciente, seed 42, e checagem temporal em 25/05. Encoder e escala ajustados apenas no treino. Correlações de Spearman somente no treino; categóricas recebem one-hot. Identificadores, SMS, datas brutas e same_day ficam fora dos preditores.

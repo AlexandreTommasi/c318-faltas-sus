@@ -241,3 +241,50 @@ python -m src.analysis
 
 O segundo comando lê o CSV original e gera métricas, tabelas e gráficos agregados
 em `reports/sprints-2-3/`. Os notebooks 01 e 03 permitem acompanhar a análise.
+
+## 13. Entrega das sprints 3 e 4
+
+Tarefas do Matheus:
+
+- **#11 (S3):** EDA sobre a partição de treino — tabelas agregadas congeladas em
+  `reports/sprints-3-4/eda/` (`summary.json` + um CSV por variável) e seção nova no
+  fim de `notebooks/01_eda.ipynb`.
+- **#15 (S4):** comparação de métodos de balanceamento — `unbalanced`,
+  `class_weight`, `undersampling` e `smote` (SMOTENC) em 5 folds
+  `StratifiedGroupKFold` no treino, em `reports/sprints-3-4/imbalance/`
+  (`comparison.csv`, `fold_metrics.json`, `metadata.json`) e em
+  `notebooks/05_balanceamento.ipynb`.
+
+Figuras geradas a partir das tabelas congeladas ficam em
+`reports/sprints-3-4/figures/`. Reprodução (`.venv` opcional; basta ter as
+dependências de `requirements.txt`):
+
+```bash
+python -m src.eda           # tabelas agregadas do treino
+python -m src.imbalance     # comparação das 4 estratégias
+python -m src.sprint_plots  # figuras em reports/sprints-3-4/figures/
+python -m unittest discover -s tests -v
+```
+
+Leitura dos resultados (validação cruzada, teste reservado, sem conclusões de teste
+final): no treino, a taxa de falta é 20,06%; a espera e a faixa etária mostram
+associações descritivas fortes, e o SMS só se associa a menos faltas dentro de
+faixas de espera a partir de 3 dias — confundido, não é evidência de eficácia e
+segue fora dos preditores. No balanceamento, a AP média fica entre 0,303 e 0,307
+nas quatro estratégias — diferença pequena e sem evidência de superioridade —; o
+recall a 0,5 sobe para ~56% com `class_weight`/reamostragem à custa de precisão,
+enquanto o recall@20% permanece ~35%. Scores balanceados não são probabilidades
+calibradas. Detalhes e ressalvas nos notebooks.
+
+## 14. Entrega da sprint 5
+
+Tarefa #19 do Matheus: curvas ROC, precisão-recall e matrizes de confusão das
+quatro estratégias de balanceamento, na validação cruzada do treino (teste
+reservado). Detalhes em [`docs/sprint-5.md`](docs/sprint-5.md) e no notebook
+[`notebooks/04_avaliacao.ipynb`](notebooks/04_avaliacao.ipynb).
+
+```bash
+.venv/bin/python -m src.validation_curves   # reports/sprint-5/evaluation/
+.venv/bin/python -m src.validation_plots    # reports/sprint-5/figures/
+.venv/bin/python -m unittest discover -s tests -v
+```

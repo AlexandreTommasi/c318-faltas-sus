@@ -1,0 +1,17 @@
+strategy,actual,predicted,count
+unbalanced,0,0,69497
+unbalanced,0,1,629
+unbalanced,1,0,17232
+unbalanced,1,1,362
+class_weight,0,0,48608
+class_weight,0,1,21518
+class_weight,1,0,7788
+class_weight,1,1,9806
+undersampling,0,0,48331
+undersampling,0,1,21795
+undersampling,1,0,7742
+undersampling,1,1,9852
+smote,0,0,47872
+smote,0,1,22254
+smote,1,0,7796
+smote,1,1,9798

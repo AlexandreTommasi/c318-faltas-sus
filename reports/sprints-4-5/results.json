@@ -1,0 +1,45 @@
+{
+  "logistic": {
+    "best_params": {
+      "model__C": 0.01
+    },
+    "best_cv_ap": 0.30573135616599323,
+    "threshold": 0.19405641163214507,
+    "validation_best_f1": 0.41501443695861406
+  },
+  "decision_tree": {
+    "best_params": {
+      "model__max_depth": null,
+      "model__min_samples_leaf": 300
+    },
+    "best_cv_ap": 0.3409682788944698,
+    "threshold": 0.21288515406162464,
+    "validation_best_f1": 0.4482673471067578
+  },
+  "metadata": {
+    "seed": 42,
+    "folds": 5,
+    "rows": 109889,
+    "fit_rows": 70443,
+    "validation_rows": 17277,
+    "test_rows": 22169,
+    "sklearn": "1.9.1",
+    "numpy": "2.5.1",
+    "pandas": "3.1.0",
+    "features": [
+      "age",
+      "bolsa_familia",
+      "hypertension",
+      "diabetes",
+      "alcoholism",
+      "handicap",
+      "waiting_days",
+      "gender",
+      "neighbourhood",
+      "weekday"
+    ],
+    "threshold_objective": "F1 on independent validation",
+    "search_objective": "average_precision",
+    "history_used": false
+  }
+}

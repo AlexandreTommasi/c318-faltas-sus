@@ -38,6 +38,7 @@ data/processed/*
 
 # Relatórios intermediários
 reports/figures/*
+!reports/figures/*.png
 !reports/figures/.gitkeep
 
 # Variáveis de ambiente

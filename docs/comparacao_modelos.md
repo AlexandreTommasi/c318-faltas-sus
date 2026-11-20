@@ -79,12 +79,63 @@ Só existe para Dummy e Regressão Logística baseline (`main`).
 - **Limiar ajustado (F1) contata muito:** na reserva de validação, a logística (0,194) atingiu F1 0,415 e a árvore (0,213) F1 0,448. Cerca de 70% dos contatos vão a quem compareceria. Esse custo entra na análise da #18.
 - **Nenhum modelo usa o histórico do paciente.** A análise da P5 indicou que o histórico separa bem quem nunca faltou (13,5% de falta), com cobertura de só 28% das linhas. Testar essa variável (sem vazamento) é uma melhoria pendente.
 
-## Pendências
+## Pendências (da versão anterior)
 
-- Random Forest e XGBoost (#13, Alexandre), na mesma partição por paciente (`random_state=42`), com e sem limiar ajustado.
 - Confirmar com o Fernando a configuração da árvore e a população dos folds de `s4_cv.csv`.
-- Decisão do grupo sobre histórico de faltas e `same_day`.
 - Avaliação dos modelos de B na validação temporal.
-- Avaliação final de todos os candidatos (Dummy, logística e árvore ajustadas, RF e XGBoost) no teste reservado (#17).
 - Mesclar a branch `feat/matheus-sprints-3-4` na `main`, para que os arquivos do Bloco C existam no repositório.
 - Arquivos `decision_tree_search.csv`, `logistic_search.csv` e `*_thresholds.csv` não foram copiados aqui; ficam na branch do Fernando.
+
+---
+
+## Segunda rodada — RF, XGBoost e histórico (#13 e #17, Alexandre)
+
+### Protocolo (branch `s4-s5/modelo-final`)
+
+Mesma partição por paciente (seed 42): 87.720 de desenvolvimento, 22.169 de teste.  
+`StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42)` — mesmos folds do Matheus.  
+Grade RF: `n_estimators=300`, `min_samples_leaf` ∈ {20, 100}, `max_features` ∈ {"sqrt", 0.5} → 4 combinações. `class_weight="balanced"`.  
+Grade XGBoost: `n_estimators=300`, `max_depth` ∈ {4, 6}, `learning_rate` ∈ {0.05, 0.1} → 4 combinações. `scale_pos_weight = neg/pos` por fold.  
+Ablação: cada modelo avaliado com e sem `HISTORY_FEATURES` (`previous_appointments`, `previous_no_shows`, `previous_no_show_rate`, `has_history`).
+
+### Validação cruzada — sem histórico (5 folds sobre 87.720 linhas)
+
+| Candidato | AP médio | ± dp | ROC-AUC | Prec@20% | Rec@20% |
+|---|---:|---:|---:|---:|---:|
+| XGBoost (lr=0.05, depth=6, n=300) | 0.3646 | 0.0066 | 0.7328 | 38,3% | 38,2% |
+| Random Forest (leaf=20, feat=sqrt, n=300) | 0.3599 | 0.0051 | 0.7312 | 37,7% | 37,6% |
+| Árvore (depth=None, leaf=300) | 0.3456 | 0.0029 | 0.7226 | 36,5% | 36,4% |
+| Logística (C=0.01) | 0.3081 | 0.0055 | 0.6624 | 35,1% | 35,0% |
+| Dummy (prior) | 0.2006 | 0.0000 | 0.5000 | 20,1% | 20,0% |
+
+### Validação cruzada — com histórico
+
+| Candidato | AP médio | ± dp | ROC-AUC | Prec@20% | Rec@20% |
+|---|---:|---:|---:|---:|---:|
+| **XGBoost** (lr=0.05, depth=6, n=300) | **0.3722** | 0.0058 | 0.7375 | 38,4% | 38,3% |
+| Random Forest (leaf=20, feat=0.5, n=300) | 0.3656 | 0.0076 | 0.7334 | 37,8% | 37,7% |
+| Árvore (depth=None, leaf=300) | 0.3475 | 0.0029 | 0.7255 | 36,8% | 36,7% |
+| Logística (C=0.01) | 0.3141 | 0.0049 | 0.6679 | 35,4% | 35,3% |
+
+### Ganho do histórico (ΔAP)
+
+| Candidato | ΔAP |
+|---|---:|
+| XGBoost | +0.0076 |
+| RF | +0.0057 |
+| Logística | +0.0060 |
+| Árvore | +0.0019 |
+
+### Avaliação única no teste reservado
+
+**Modelo final escolhido:** XGBoost com histórico. Limiar: 0.657 (política top-20% de risco, calculado sobre OOF do desenvolvimento).
+
+| Candidato | AP | ROC-AUC | Prec@20% | Rec@20% | F1 (limiar 0.657) |
+|---|---:|---:|---:|---:|---:|
+| Dummy | 0.2029 | 0.500 | 20,3% | 20,0% | 0,00 |
+| Logística | 0.3040 | 0.657 | 34,4% | 33,9% | 0,83% |
+| Árvore | 0.3404 | 0.720 | 35,4% | 34,9% | 0,00 |
+| Random Forest | 0.3587 | 0.728 | 36,9% | 36,4% | 35,8% |
+| **XGBoost** | **0.3617** | **0.730** | **37,1%** | **36,6%** | **36,8%** |
+
+Avaliação realizada em 2026-11-20. Artefatos em `reports/modelo-final/`. Ver `docs/modelo_final.md` para análise completa (SHAP, erros, limitações).

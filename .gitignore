@@ -43,3 +43,6 @@ reports/figures/*
 
 # Variáveis de ambiente
 .env
+
+# OOF predictions (scores individuais, gerados por src.final_model --fase cv)
+reports/modelo-final/oof.npz

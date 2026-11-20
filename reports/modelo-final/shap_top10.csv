@@ -1,0 +1,11 @@
+rank,feature,mean_abs_shap
+1,neighbourhood_ILHAS OCEÂNICAS DE TRINDADE,1.1257815
+2,waiting_days,0.81514233
+3,neighbourhood_AEROPORTO,0.6695008
+4,age,0.6138986
+5,neighbourhood_SANTA MARTHA,0.32972383
+6,neighbourhood_PONTAL DE CAMBURI,0.2905291
+7,weekday_0,0.279452
+8,neighbourhood_REPÚBLICA,0.25552627
+9,neighbourhood_SOLON BORGES,0.23921293
+10,neighbourhood_ITARARÉ,0.227648

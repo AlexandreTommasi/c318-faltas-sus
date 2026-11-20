@@ -1,0 +1,15 @@
+rank,variable,mean_abs_shap_agregado
+1,neighbourhood,1.625334
+2,waiting_days,0.815143
+3,age,0.613899
+4,weekday,0.309761
+5,previous_appointments,0.087694
+6,hypertension,0.077737
+7,previous_no_show_rate,0.062463
+8,gender,0.044848
+9,diabetes,0.034042
+10,bolsa_familia,0.027637
+11,handicap,0.012731
+12,previous_no_shows,0.010442
+13,alcoholism,0.007733
+14,has_history,0.0

@@ -1,0 +1,19 @@
+{
+  "model": "xgboost",
+  "use_history": true,
+  "params": {
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "n_estimators": 300,
+    "eval_metric": "logloss",
+    "verbosity": 0,
+    "random_state": 42
+  },
+  "limiar_top20": 0.6567984223365784,
+  "limiar_f1": 0.5406259298324585,
+  "limiar_principal": 0.6567984223365784,
+  "data_congelamento": "2026-11-20T23:15:22.348267+00:00",
+  "oof_n_rows": 87720,
+  "oof_ap": 0.37189324230208415,
+  "nota": "limiar_principal = top-20% pol\u00edtica de contato; limiar_f1 \u00e9 alternativa"
+}

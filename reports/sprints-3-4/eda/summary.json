@@ -1,0 +1,53 @@
+{
+  "scope": "patient_split_training_only",
+  "seed": 42,
+  "clean_rows": 109889,
+  "eda_rows": 87720,
+  "reserved_test_rows": 22169,
+  "patients": 49838,
+  "no_shows": 17594,
+  "no_show_rate": 0.20056999544003648,
+  "numeric_summary": {
+    "age": {
+      "count": 87720.0,
+      "mean": 37.11019151846785,
+      "std": 23.117016137036362,
+      "min": 0.0,
+      "25%": 18.0,
+      "50%": 37.0,
+      "75%": 55.0,
+      "max": 115.0
+    },
+    "waiting_days": {
+      "count": 87720.0,
+      "mean": 10.166301869585043,
+      "std": 15.263864386773504,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 4.0,
+      "75%": 15.0,
+      "max": 179.0
+    }
+  },
+  "missing": {
+    "patient_id": 0,
+    "appointment_id": 0,
+    "gender": 0,
+    "scheduled_day": 0,
+    "appointment_day": 0,
+    "age": 0,
+    "neighbourhood": 0,
+    "bolsa_familia": 0,
+    "hypertension": 0,
+    "diabetes": 0,
+    "alcoholism": 0,
+    "handicap": 0,
+    "sms_received": 0,
+    "no_show": 0,
+    "waiting_days": 0,
+    "weekday": 0,
+    "same_day": 0,
+    "age_group": 0,
+    "waiting_group": 0
+  }
+}

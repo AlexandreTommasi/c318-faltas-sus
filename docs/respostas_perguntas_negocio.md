@@ -1,6 +1,6 @@
 # Respostas às perguntas de negócio 1 a 6 (issue #10)
 
-Análise descritiva do dataset *Medical Appointment No Shows* após a limpeza de `src/data.py`, feita em `notebooks/05_perguntas_negocio.ipynb`. Tabelas completas em `reports/tabelas_perguntas_negocio.csv` e gráficos em `reports/figures/p1_*.png` a `p6_*.png`.
+Análise descritiva do dataset *Medical Appointment No Shows* após a limpeza de `src/data.py`, feita em `notebooks/06_perguntas_negocio.ipynb`. Tabelas completas em `reports/tabelas_perguntas_negocio.csv` e gráficos em `reports/figures/p1_*.png` a `p6_*.png`.
 
 **Base analisada:** 109.889 agendamentos, com taxa geral de faltas de **20,10%**. Partindo do CSV bruto (110.527 linhas), foram removidas 6 linhas inválidas (1 idade negativa e 5 esperas negativas) e 632 duplicatas.
 

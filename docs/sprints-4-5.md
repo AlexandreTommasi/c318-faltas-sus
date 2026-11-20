@@ -12,7 +12,7 @@ python -m unittest discover -s tests -v
 python -m src.model_selection --jobs 2
 ```
 
-O notebook `05_selecao_modelos_s4_s5.ipynb` apresenta os relatórios em
+O notebook `notebooks/07_selecao_modelos.ipynb` apresenta os relatórios em
 `reports/sprints-4-5/`. Nenhum dado individual é versionado.
 
 ## Protocolo
@@ -41,8 +41,16 @@ incorporar desfechos de outros folds na engenharia de atributos.
    que maximiza F1 na validação independente. Avaliamos todos os valores
    distintos das probabilidades; empates favorecem o maior limiar. Não há
    novo treinamento após essa escolha.
-7. Avaliamos uma vez no teste os dois modelos, com limiar 0,5 e ajustado.
-   O teste não escolhe hiperparâmetros, limiar ou modelo final.
+
+O teste reservado (22.169 consultas, ~20% do total) **não é avaliado nesta
+entrega**. Sua avaliação única cabe à tarefa de modelo final (#17), conforme
+o guardrail do projeto.
+
+**Nota de comparabilidade:** esta entrega reserva 20% adicionais do
+desenvolvimento para validação independente do limiar antes do CV, de modo
+que os folds de busca cobrem ~64% do total (contra ~80% nos folds do Matheus,
+S4/#15). Os números de CV desta entrega não são diretamente comparáveis com
+os daquela.
 
 F1 é um critério técnico, sem pressupor custos ou eficácia de contato. As
 métricas de ranking top 20% já existentes são mantidas: mudar o limiar não
@@ -53,28 +61,28 @@ com 1 significando falta. Precisão sem positivos preditos é definida como zero
 ## Resultados executados
 
 Foram processadas 109.889 consultas: 70.443 no treino da busca, 17.277 na
-validação de limiar e 22.169 no teste (prevalência de faltas: 20,29%).
+validação de limiar e 22.169 reservadas para o teste final (prevalência de
+faltas: 20,29%).
 
-| Modelo | Melhor configuração | AP CV da busca | Limiar selecionado | AP teste | F1 teste (0,5 → ajustado) | Recall ajustado | Precisão ajustada |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Logística | C=0,01 | 0,3057 | 0,1941 | 0,2948 | 0,0230 → 0,3905 | 56,55% | 29,82% |
-| Árvore | profundidade ilimitada, folha mínima 300 | 0,3410 | 0,2129 | 0,3340 | 0,0000 → 0,4325 | 73,58% | 30,63% |
+| Modelo | Melhor configuração | AP CV da busca | Limiar selecionado | F1 máximo na validação |
+|---|---|---:|---:|---:|
+| Logística | C=0,01 | 0,3057 | 0,1941 | 0,4150 |
+| Árvore | profundidade ilimitada, folha mínima 300 | 0,3410 | 0,2129 | 0,4483 |
 
-O ajuste amplia a detecção de faltas e também os falsos positivos: 5.985 na
-logística e 7.495 na árvore, no teste. A árvore com limiar 0,5 não prevê
-faltas neste conjunto. O ganho de recall não representa consultas recuperadas
-nem comprova eficácia de uma intervenção. Não escolhemos o modelo final.
+A AP da busca é uma estatística de seleção, sujeita a otimismo; o F1 máximo
+é obtido na validação independente e não no treino. A avaliação externa no
+teste reservado fica para a tarefa de modelo final (#17).
 
 ## Artefatos e limites
 
 `s4_cv.csv` contém os cinco folds dos modelos sem tuning (média e desvio
 padrão amostral são apresentados no notebook). `*_search.csv` registra todos
-os candidatos e seus scores por fold; `*_thresholds.csv` registra os limiares
-da validação. `results.json` contém parâmetros, limiares, métricas de teste,
-tamanhos das partições e versões do ambiente.
+os candidatos e seus scores por fold; `*_thresholds.csv` registra até 501
+pontos da curva precisão-recall na validação, incluindo o limiar escolhido.
+`results.json` contém parâmetros, limiares, F1 máximo na validação, tamanhos
+das partições e versões do ambiente. Métricas de teste não são versionadas.
 
-A melhor AP da busca é uma estatística de seleção, sujeita a otimismo; o
-teste reservado fornece a avaliação externa. O teste por paciente avalia
+A separação por paciente avalia
 generalização para outros pacientes e não substitui validação temporal para
 implantação futura. A coleta de uma cidade em 2016 limita generalização.
 A escolha do modelo final, SHAP, curvas de avaliação e impacto de negócio

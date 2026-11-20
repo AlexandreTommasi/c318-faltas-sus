@@ -62,11 +62,13 @@ class ThresholdClassifier:
         return (scores >= self.threshold).astype(int)
 
 
-def run(df, output, n_splits=5, n_jobs=1):
+def run(df, output, n_splits=5, n_jobs=1, evaluate_test=False):
     """Reserva teste por paciente e validação independente para o limiar.
 
     O ajuste final usa somente o treino de busca: não refaz fit depois de
     calibrar o limiar, preservando a escala das probabilidades selecionadas.
+    O teste reservado não é avaliado por padrão (evaluate_test=False);
+    sua avaliação cabe à tarefa de modelo final (#17).
     """
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
@@ -87,8 +89,9 @@ def run(df, output, n_splits=5, n_jobs=1):
                           {'model__max_depth': [3, 5, 8, None],
                            'model__min_samples_leaf': [20, 100, 300]}),
     }
+    if evaluate_test:
+        X_test, y_test = split_features_target(df.iloc[test])
     results, cv_rows = {}, []
-    X_test, y_test = split_features_target(df.iloc[test])
     for name, (estimator, grid) in candidates.items():
         pipeline = Pipeline([('preprocess', encode_categoricals(X_fit)),
                              ('model', estimator)])
@@ -106,14 +109,17 @@ def run(df, output, n_splits=5, n_jobs=1):
         scores = model.predict_proba(X.iloc[validation])[:, list(model.classes_).index(1)]
         threshold, curve = select_threshold(y.iloc[validation], scores)
         curve.to_csv(output / f'{name}_thresholds.csv', index=False)
-        results[name] = {
+        entry = {
             'best_params': search.best_params_,
             'best_cv_ap': float(search.best_score_),
             'threshold': threshold,
             'validation_best_f1': float(curve.f1.max()),
-            'test_default': compute_metrics(model, X_test, y_test),
-            'test_adjusted': compute_metrics(ThresholdClassifier(model, threshold), X_test, y_test),
         }
+        if evaluate_test:
+            entry['test_default'] = compute_metrics(model, X_test, y_test)
+            entry['test_adjusted'] = compute_metrics(
+                ThresholdClassifier(model, threshold), X_test, y_test)
+        results[name] = entry
     pd.DataFrame(cv_rows).to_csv(output / 's4_cv.csv', index=False)
     results['metadata'] = dict(seed=42, folds=n_splits, rows=len(df),
                                fit_rows=len(fit), validation_rows=len(validation),

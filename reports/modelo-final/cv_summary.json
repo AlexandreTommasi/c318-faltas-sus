@@ -1,0 +1,66 @@
+{
+  "n_splits": 5,
+  "development_rows": 87720,
+  "features_no_history": [
+    "age",
+    "bolsa_familia",
+    "hypertension",
+    "diabetes",
+    "alcoholism",
+    "handicap",
+    "waiting_days",
+    "gender",
+    "neighbourhood",
+    "weekday"
+  ],
+  "features_with_history": [
+    "age",
+    "bolsa_familia",
+    "hypertension",
+    "diabetes",
+    "alcoholism",
+    "handicap",
+    "waiting_days",
+    "gender",
+    "neighbourhood",
+    "weekday",
+    "previous_appointments",
+    "previous_no_shows",
+    "previous_no_show_rate",
+    "has_history"
+  ],
+  "best_params": {
+    "random_forest__0": {
+      "n_estimators": 300,
+      "min_samples_leaf": 20,
+      "max_features": "sqrt",
+      "class_weight": "balanced",
+      "n_jobs": -1,
+      "random_state": 42
+    },
+    "xgboost__0": {
+      "max_depth": 6,
+      "learning_rate": 0.05,
+      "n_estimators": 300,
+      "eval_metric": "logloss",
+      "verbosity": 0,
+      "random_state": 42
+    },
+    "random_forest__1": {
+      "n_estimators": 300,
+      "min_samples_leaf": 20,
+      "max_features": 0.5,
+      "class_weight": "balanced",
+      "n_jobs": -1,
+      "random_state": 42
+    },
+    "xgboost__1": {
+      "max_depth": 6,
+      "learning_rate": 0.05,
+      "n_estimators": 300,
+      "eval_metric": "logloss",
+      "verbosity": 0,
+      "random_state": 42
+    }
+  }
+}

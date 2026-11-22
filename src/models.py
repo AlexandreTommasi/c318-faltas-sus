@@ -29,7 +29,8 @@ def get_random_forest() -> BaseEstimator:
     Returns:
         Instância do classificador não treinada.
     """
-    ...
+    from sklearn.ensemble import RandomForestClassifier
+    return RandomForestClassifier(class_weight="balanced", n_jobs=-1, random_state=42)
 
 
 def get_xgboost() -> BaseEstimator:
@@ -38,7 +39,8 @@ def get_xgboost() -> BaseEstimator:
     Returns:
         Instância do classificador não treinada.
     """
-    ...
+    from xgboost import XGBClassifier
+    return XGBClassifier(eval_metric="logloss", verbosity=0, random_state=42)
 
 
 def train(model: BaseEstimator, X_train, y_train) -> BaseEstimator:
@@ -62,7 +64,8 @@ def save_model(model: BaseEstimator, path: str) -> None:
         model: Modelo treinado.
         path: Caminho de destino (ex.: models/rf.joblib).
     """
-    ...
+    import joblib
+    joblib.dump(model, path)
 
 
 def load_model(path: str) -> BaseEstimator:
@@ -74,7 +77,8 @@ def load_model(path: str) -> BaseEstimator:
     Returns:
         Modelo carregado.
     """
-    ...
+    import joblib
+    return joblib.load(path)
 
 
 def split_by_patient(df, test_size=0.2):

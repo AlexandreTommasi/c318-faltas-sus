@@ -96,3 +96,13 @@ Cada entrada segue o padrão:
 **Decisão:** Dummy e regressão logística com partição por paciente, seed 42, e checagem temporal em 25/05. Encoder e escala ajustados apenas no treino. Correlações de Spearman somente no treino; categóricas recebem one-hot. Identificadores, SMS, datas brutas e same_day ficam fora dos preditores.
 
 **Motivação:** Preservar a avaliação e evitar informação posterior ao agendamento. Histórico do paciente permanece na tarefa #9 do Alexandre. EDA e respostas de negócio permanecem nas tarefas #11 e #10 do Matheus e Antonio.
+
+---
+
+### 2026-11-20 — Modelo final e limiar (#13 e #17)
+
+**Decisão:** XGBoost com histórico de faltas (`use_history=True`) como modelo final. Hiperparâmetros: `max_depth=6`, `learning_rate=0.05`, `n_estimators=300`, `scale_pos_weight` calculado por fold (neg/pos do treino). Limiar principal: **0.657** (política top-20% de risco, calculado sobre predições out-of-fold do desenvolvimento). Limiar alternativo (maximiza F1): 0.541.
+
+**Motivação:** XGBoost com histórico alcançou maior AP em validação cruzada (0.3722 ± 0.0058) e no teste reservado (AP 0.3617, ROC-AUC 0.730, recall@20% 36,6%), superando RF (AP 0.3587, ROC-AUC 0.728). O histórico de faltas aumentou a AP em +0.0076 no XGBoost — o maior ganho entre os candidatos. O limiar top-20% foi escolhido como limiar principal por ser a métrica de negócio do projeto (política de contato); o limiar F1 é registrado como alternativa.
+
+**Alternativas consideradas:** Random Forest com histórico — descartado por AP e ROC-AUC levemente inferiores ao XGBoost (ΔAP 0.003 no teste). Árvore de decisão — mais interpretável, mas AP notavelmente menor (0.340 no teste). Logística — mais simples, mas AP muito inferior (0.304 no teste).

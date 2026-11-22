@@ -8,15 +8,15 @@ Tabela comparativa dos modelos de classificação de faltas. **Versão 3 (22/11)
 |---|---|
 | A. Dummy e Logística baseline (sem histórico) | `main`: `reports/sprints-2-3/baselines.json` (`python -m src.analysis`) |
 | B. Cinco candidatos no teste reservado (com histórico) e ablação | branch `s4-s5/modelo-final` (Alexandre, commit `43e47a3`): `reports/modelo-final/teste_final.csv`, `teste_final.json`, `cv_candidatos.csv`, `cv_ablacao_historico.csv`, `selecao_congelada.json` |
-| C. Logística ajustada e Árvore (sem histórico) | Fernando (PR #40): `reports/sprints-4-5/` |
+| C. Candidatos sem histórico (validação cruzada) | branch `s4-s5/modelo-final` (Alexandre, commit `43e47a3`): `reports/modelo-final/cv_candidatos.csv` (linhas `use_history=False`, mesma fonte de B) |
 | D. Balanceamento | Matheus (PR #39): `reports/sprint-5/evaluation/` |
 
 ## Como cada bloco foi avaliado (não misturar)
 
 | Protocolo | Dados | Onde aparece |
 |---|---|---|
-| **Teste reservado por paciente** | `GroupShuffleSplit` por `patient_id`, `test_size=0,2`, `random_state=42`: 87.720 de desenvolvimento e **22.169 de teste (4.497 faltas, prevalência 20,29%)**. A mesma função `split_by_patient` é usada em todas as entregas. | Blocos 1, 2 e 3 |
-| **Validação cruzada, 5 folds** (`StratifiedGroupKFold`) | Sobre os 87.720 de desenvolvimento, sem usar o teste. | Blocos 4 e 5 |
+| **Teste reservado por paciente** | `GroupShuffleSplit` por `patient_id`, `test_size=0,2`, `random_state=42`: 87.720 de desenvolvimento e **22.169 de teste (4.497 faltas, prevalência 20,29%)**. A mesma função `split_by_patient` é usada em todas as entregas. | Bloco 1 |
+| **Validação cruzada, 5 folds** (`StratifiedGroupKFold`) | Sobre os 87.720 de desenvolvimento, sem usar o teste. | Blocos 2, 3, 4 e 5 |
 | **Seleção do modelo final** | Hiperparâmetros e limiar escolhidos por AP em validação cruzada e previsões *out-of-fold* do desenvolvimento, **congelados antes de abrir o teste** (`selecao_congelada.json`). | Bloco 1 |
 | **Temporal** | Treino com `appointment_day < 25/05/2016`, teste com `scheduled_day ≥ 25/05/2016` (22.908 agendamentos, prevalência 11,80%). | Bloco 6 |
 
@@ -40,33 +40,29 @@ As faltas capturadas são derivadas do recall salvo (recall × 4.497). "Ganho so
 
 **Configurações.** Logística: `C = 0,01`, `max_iter = 2000`. Árvore: sem limite de profundidade, `min_samples_leaf = 300`. Random Forest: 300 árvores, `min_samples_leaf = 20`, `max_features = 0,5`, `class_weight = "balanced"`. XGBoost: 300 árvores, `max_depth = 6`, `learning_rate = 0,05`, `scale_pos_weight` = negativos ÷ positivos, calculado por fold.
 
-### Random Forest e XGBoost com o limiar congelado
+### XGBoost com o limiar congelado
 
-O limiar principal (0,657) é o que isola os 20% de maior risco nas previsões *out-of-fold* do XGBoost. Pelo código de `run_final`, o mesmo valor é aplicado a todos os candidatos; por isso só faz sentido como política de contato para o XGBoost.
+O limiar principal (0,657) é o que isola os 20% de maior risco nas previsões *out-of-fold* do XGBoost. Confirmado pelo código de `run_final`: o mesmo `limiar_principal` é aplicado a todos os candidatos; F1 e matriz de confusão são mostrados apenas para o modelo final. Para Dummy, Logística e Árvore, o limiar 0,657 fica acima dos escores e esses modelos quase nada sinalizam (F1 ≈ 0). O limiar F1 (0,541), calculado sobre as previsões *out-of-fold* do desenvolvimento, não foi aplicado ao teste reservado; métricas a esse limiar não estão nos artefatos salvos.
 
-| Modelo | Precisão | Recall | F1 | Acurácia | Agendamentos sinalizados | Matriz `[[VN, FP], [FN, VP]]` |
+| Limiar | Precisão | Recall | F1 | Acurácia | Agendamentos sinalizados | Matriz `[[VN, FP], [FN, VP]]` |
 |---|---:|---:|---:|---:|---:|---|
-| XGBoost (0,657) | 37,1% | 36,5% | 36,8% | 74,6% | 4.423 (19,95%) | `[[14.891, 2.781], [2.855, 1.642]]` |
-| Random Forest (0,657) | 37,2% | 34,6% | 35,8% | 74,9% | 4.181 (18,9%) | `[[15.045, 2.627], [2.943, 1.554]]` |
+| Top-20% (0,657) | 37,1% | 36,5% | 36,8% | 74,6% | 4.423 (19,95%) | `[[14.891, 2.781], [2.855, 1.642]]` |
 
-Precisão, recall e acurácia foram calculadas a partir das matrizes salvas. Para Dummy, Logística e Árvore, o F1 com esse limiar é próximo de zero (o limiar fica acima dos escores desses modelos) e **não é comparável** com o dos modelos acima.
+Precisão, recall e acurácia foram calculadas a partir das matrizes salvas.
 
-## Bloco 2: sem histórico, teste reservado (baselines e ajustes da S4/S5)
+## Bloco 2: sem histórico, validação cruzada (5 folds, 87.720 de desenvolvimento)
 
-Mesmo teste de 22.169 agendamentos, 10 variáveis, sem histórico.
+Mesmos 5 folds do `StratifiedGroupKFold`, 10 variáveis, sem histórico. No teste reservado foram avaliados uma única vez todos os candidatos com histórico, depois da escolha do modelo final pela CV (issue #17, Bloco 1). As versões sem histórico foram comparadas só em validação cruzada.
 
-| Modelo | Precisão | Recall | F1 | AP | ROC-AUC | Precisão@20% | Recall@20% |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Dummy (prior), limiar 0,5 | 0,0% | 0,0% | 0,0% | 20,3% | 0,500 | 20,3% | 20,0% |
-| Logística baseline (`main`), limiar 0,5 | 29,1% | 1,3% | 2,6% | 29,4% | 0,644 | 33,7% | 33,2% |
-| Logística ajustada (C = 0,01), limiar 0,5 | 28,4% | 1,2% | 2,3% | 29,5% | 0,649 | 33,5% | 33,0% |
-| Logística ajustada, limiar 0,194 | 29,8% | 56,5% | 39,0% | 29,5% | 0,649 | 33,5% | 33,0% |
-| Árvore (leaf 300), limiar 0,5 | 0,0% | 0,0% | 0,0% | 33,4% | 0,713 | 35,7% | 35,2% |
-| Árvore (leaf 300), limiar 0,213 | 30,6% | 73,6% | 43,3% | 33,4% | 0,713 | 35,7% | 35,2% |
+| Modelo | AP | ROC-AUC | Precisão@20% | Recall@20% |
+|---|---:|---:|---:|---:|
+| Dummy | 0,201 ± 0,000 | 0,500 ± 0,000 | 20,1% ± 0,0% | 20,0% ± 0,0% |
+| Regressão Logística | 0,308 ± 0,006 | 0,662 ± 0,005 | 35,1% ± 0,3% | 35,0% ± 0,3% |
+| Árvore de Decisão (leaf 300) | 0,346 ± 0,003 | 0,723 ± 0,003 | 36,5% ± 0,6% | 36,4% ± 0,6% |
+| Random Forest | 0,360 ± 0,005 | 0,731 ± 0,004 | 37,7% ± 0,7% | 37,6% ± 0,7% |
+| XGBoost | 0,365 ± 0,007 | 0,733 ± 0,005 | 38,3% ± 0,5% | 38,2% ± 0,5% |
 
-Com o limiar ajustado pelo F1, a logística sinaliza 38,5% da agenda e a árvore 48,7%. Os limiares foram escolhidos numa reserva de validação independente, sem usar o teste.
-
-**Atenção.** Estes números vêm da versão original de `reports/sprints-4-5/results.json` do Fernando. A versão atual desse arquivo na `main` não traz mais os blocos de teste, só a seleção. A fonte dos valores acima precisa ser confirmada com o Fernando.
+Fonte: `reports/modelo-final/cv_candidatos.csv` (`src.final_model --fase cv`, branch `s4-s5/modelo-final`, commit `43e47a3`).
 
 ## Bloco 3: efeito do histórico (validação cruzada, AP médio em 5 folds)
 
@@ -100,7 +96,7 @@ Matrizes de confusão (soma dos folds, 87.720 linhas e 17.594 faltas): sem balan
 | Regressão Logística | 0,304 ± 0,003 | 0,659 ± 0,003 | 35,9% | 2,1% | 3,9% |
 | Árvore de Decisão | 0,229 ± 0,003 | 0,559 ± 0,004 | 30,1% | 27,3% | 28,6% |
 
-A árvore deste arquivo (AP 0,229) é muito pior que a árvore ajustada (AP 0,34). Provavelmente é a árvore com hiperparâmetros padrão, que sobreajusta. É inferência pelos números, a confirmar com o Fernando.
+A árvore deste arquivo (AP 0,229) é muito pior que a árvore ajustada (AP 0,34) por duas razões confirmadas no código de `src/model_selection.py`: (1) o `s4_cv.csv` usa `DecisionTreeClassifier(random_state=42)` com todos os hiperparâmetros padrão (sem limite de profundidade, `min_samples_leaf=1`), antes da busca em grade; (2) o CV corre sobre o subconjunto de ajuste (`fit`), que é menor que os 87.720 de desenvolvimento usados em `final_model.py`. O `min_samples_leaf=300` foi escolhido pela busca em grade e está salvo em `decision_tree_search.csv`, não no `s4_cv.csv`.
 
 ## Bloco 6: validação temporal (22.908 agendamentos, 2.702 faltas)
 
@@ -112,6 +108,8 @@ Só existe para Dummy e Logística baseline (`main`), sem histórico.
 | Regressão Logística | 0,0% | 0,0% | 0,0% | 16,5% | 0,585 | 17,6% | 29,8% |
 
 A temporal tem outra prevalência (11,8% contra 20,3%). **Não compare seus valores com os dos outros blocos.**
+
+**Limitação documentada.** A validação temporal foi feita apenas para Dummy e Logística (sem histórico). O modelo final (XGBoost com histórico) e os demais candidatos não foram avaliados nesta janela (~6 semanas do dataset, `appointment_day < 25/05/2016`).
 
 ## O que os resultados mostram
 
@@ -125,10 +123,7 @@ A temporal tem outra prevalência (11,8% contra 20,3%). **Não compare seus valo
 
 ## Pendências
 
-- Fernando: confirmar a configuração da árvore de `s4_cv.csv` e onde estão hoje os números de teste da logística e da árvore ajustadas, já que o `results.json` da `main` não os traz mais.
-- Alexandre: confirmar que o mesmo limiar de 0,657 é aplicado a todos os candidatos em `run_final`; se for, a coluna de F1 só vale para o XGBoost.
 - Decisão do grupo sobre `same_day` (não testado em nenhum modelo).
-- Validação temporal do modelo final e dos demais candidatos (hoje só Dummy e Logística).
 - Avaliação das estratégias de balanceamento no teste reservado (hoje só em validação cruzada).
 - Registrar no relatório que o teste reservado já foi usado em relatórios anteriores (baselines e ajustes da S4/S5), além da avaliação única dos candidatos finais.
 - Mesclar a branch `s4-s5/modelo-final` na `main`, para que os arquivos do Bloco 1 existam no repositório.

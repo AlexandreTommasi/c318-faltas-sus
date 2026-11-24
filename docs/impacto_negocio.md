@@ -9,7 +9,7 @@ Tradução das métricas técnicas em consultas recuperadas e custo de contato, 
 | Parâmetro | Valor | Observação |
 |---|---|---|
 | Efeito do contato (*e*) | 10%, 20% e 30% das faltas contatadas viram comparecimento ou reaproveitamento da vaga | Hipótese. O dataset não mede o efeito de um contato ativo. A diferença associada ao SMS (P6) **não** serve como valor de *e*. |
-| Valor da vaga | US$ 37 | Fonte secundária (Ref. 4 do README). |
+| Valor da vaga | US$ 37 | Fonte secundária (Ref. 4 do README); a fonte primária (Furtado et al., 2016) não foi localizada, por isso o valor é tratado como hipótese. |
 | Custo por contato | R$ 1,50 | Hipótese do grupo. |
 | Câmbio | R$ 4,00, 5,00 e 6,00 por US$ | **Hipótese de sensibilidade**, não cotação real. Necessária porque vaga e contato estão em moedas diferentes. |
 
@@ -71,7 +71,7 @@ Mesmo com *e* de 10%, o cenário mais pessimista, o retorno por real gasto fica 
 
 ## O que isso significa
 
-- **O contato ativo compensa em todos os cenários testados**, para qualquer modelo, enquanto *e* ficar acima de cerca de 3%.
+- **O contato ativo compensa em todos os cenários testados**, para qualquer modelo, enquanto *e* ficar acima do ponto de equilíbrio, que varia entre 1,8% (XGBoost, câmbio R$ 6) e 2,9% (logística, câmbio R$ 4).
 - **A escolha do modelo pesa pouco no resultado.** O XGBoost recupera cerca de 1 vaga a mais por 1.000 agendamentos que a logística com e = 20% (14,8 contra 13,8), cerca de R$ 200 a mais de custo líquido por 1.000 agendamentos no câmbio de 5,0. Boa parte do valor vem de contatar quem está no topo do ranking, seja qual for o modelo. A diferença entre os modelos vem de uma única partição de teste, sem intervalo de confiança.
 - **Contra o acaso, o ganho é grande:** com o mesmo custo, o XGBoost captura 74 faltas por 1.000 agendamentos contra 41 do contato aleatório (1,83 vez), o que dá 6,7 vagas a mais com e = 20%.
 - **Cerca de 63% dos contatos vão a quem compareceria** (precisão de 37,1%). Esse custo está incluído na conta, mas pesa na experiência do paciente.

@@ -2,7 +2,7 @@
 
 ## Ambiente
 
-- Ambiente verificado com Python 3.15.2. Criar e usar a venv local (ignorada no git):
+- Ambiente verificado com Python 3.14.5. Criar e usar a venv local (ignorada no git):
   ```bash
   python3 -m venv .venv
   .venv/bin/pip install -r requirements.txt

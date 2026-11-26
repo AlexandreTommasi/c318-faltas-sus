@@ -314,7 +314,7 @@ c318-faltas-sus/
 └── README.md
 ```
 
-**Ambiente.** Python 3.12.4; as versões dos pacotes estão fixadas em `requirements.txt`.
+**Ambiente.** Python 3.14.5; as versões dos pacotes estão fixadas em `requirements.txt`.
 
 ```
 git clone https://github.com/AlexandreTommasi/c318-faltas-sus.git
@@ -430,6 +430,7 @@ reservado). Detalhes em [`docs/sprint-5.md`](docs/sprint-5.md) e no notebook
 python -m src.validation_curves   # reports/sprint-5/evaluation/
 python -m src.validation_plots    # reports/sprint-5/figures/
 python -m unittest discover -s tests -v
+```
 
 ### 16.4 Sprints 4 e 5 (Fernando)
 

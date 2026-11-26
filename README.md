@@ -438,7 +438,7 @@ Tarefas #16 e #20: validação cruzada estratificada por paciente, busca de hipe
 
 ### 16.5 Modelo final (Alexandre)
 
-Tarefas #13 e #17: Random Forest e XGBoost, ablação do histórico, escolha do modelo final, avaliação única no teste, SHAP e análise de erros. Detalhes em [`docs/modelo_final.md`](docs/modelo_final.md) e no notebook [`notebooks/08_modelo_final.ipynb`](notebooks/08_modelo_final.ipynb).
+Tarefas #13 e #17: Random Forest e XGBoost, ablação do histórico, escolha do modelo final, avaliação única no teste, SHAP e análise de erros. Detalhes em [`docs/modelo_final.md`](docs/modelo_final.md). O notebook-resumo do projeto ([`notebooks/08_modelo_final.ipynb`](notebooks/08_modelo_final.ipynb)) reúne todas as etapas, do contexto ao impacto de negócio, lendo apenas artefatos congelados de `reports/`.
 
 ### 16.6 Comparação de modelos e impacto de negócio (Antonio)
 
